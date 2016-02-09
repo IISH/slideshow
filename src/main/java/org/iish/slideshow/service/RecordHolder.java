@@ -1,5 +1,6 @@
 package org.iish.slideshow.service;
 
+import org.iish.slideshow.configuration.Blacklist;
 import org.marc4j.marc.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +11,6 @@ import java.util.List;
 
 @Component
 public class RecordHolder {
-    // Removed: album
     private static final List<String> FORMATS = Arrays.asList(
             "poster", "photo", "print", "drawing", "half-tone photo", "picture postcard", "button", "badge", "sticker",
             "small printed matter", "newspaper poster", "design", "object", "painting", "montage", "flag", "banner",
@@ -21,8 +21,9 @@ public class RecordHolder {
     private Record       curRecord;
 
     @Autowired
-    public RecordHolder(@Value("${api.url}") String apiUrl, @Value("${sor.accessToken}") String accessToken) {
-        this.randomRecord = new RandomRecord(apiUrl, accessToken, FORMATS);
+    public RecordHolder(@Value("${api.url}") String apiUrl, @Value("${sor.accessToken}") String accessToken,
+                        Blacklist blacklist) {
+        this.randomRecord = new RandomRecord(apiUrl, accessToken, FORMATS, blacklist);
     }
 
     public Record getCurRecord() {

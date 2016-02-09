@@ -40,6 +40,12 @@
   </dependency>
 
   <dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-configuration-processor</artifactId>
+   <optional>true</optional>
+  </dependency>
+
+  <dependency>
    <groupId>info.freelibrary</groupId>
    <artifactId>freelib-marc4j</artifactId>
    <version>2.6.8</version>

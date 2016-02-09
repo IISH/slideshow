@@ -1,5 +1,6 @@
 package org.iish.slideshow.service;
 
+import org.iish.slideshow.configuration.Blacklist;
 import org.marc4j.MarcReader;
 import org.marc4j.MarcXmlReader;
 import org.marc4j.marc.DataField;
@@ -26,31 +27,27 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
 public class RandomRecord {
-    private static final List<String> BLACKLIST = Arrays.asList(
-            "30051002834569", "30051001316337", "30051001362448", "30051002739081", "30051001115101", "30051001803581",
-            "30051000646890", "30051002347059"
-    );
-
     private static final int MAX_RECORDS = 20;
     private static final int MIN_SIZE    = 400;
 
     private final String          apiUrl;
     private final String          accessToken;
     private final List<String>    formats;
+    private final Blacklist       blacklist;
     private final DocumentBuilder documentBuilder;
 
     private static final Logger LOGGER = Logger.getLogger(RandomRecord.class.getName());
 
-    public RandomRecord(String apiUrl, String accessToken, List<String> formats) {
+    public RandomRecord(String apiUrl, String accessToken, List<String> formats, Blacklist blacklist) {
         this.apiUrl = apiUrl;
         this.accessToken = accessToken;
         this.formats = formats;
+        this.blacklist = blacklist;
 
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -74,7 +71,7 @@ public class RandomRecord {
             numberOfRecords = getNumberOfRecords(format);
         }
 
-        LOGGER.warning("Searching for image with format " + format);
+        LOGGER.info("Searching for image with format " + format);
 
         Record record = null;
         while (record == null) {
@@ -82,7 +79,7 @@ public class RandomRecord {
             record = getRecord(format, recordIdx);
         }
 
-        LOGGER.warning("Record found with format " + format);
+        LOGGER.info("Record found with format " + format);
 
         return record;
     }
@@ -119,7 +116,7 @@ public class RandomRecord {
             if (!isBlacklisted(record, barcode) && isImgInSor(barcode)) {
                 return record;
             }
-            LOGGER.warning("No image found in the SOR (or invalid size) for barcode "
+            LOGGER.info("No image found in the SOR (or invalid size) for barcode "
                     + barcode + " for format " + format);
         }
 
@@ -132,15 +129,17 @@ public class RandomRecord {
             Subfield subfield = dataField.getSubfield('a');
             if (subfield != null) {
                 String organization = subfield.getData();
-                if (organization.toLowerCase().contains("amsterdamse paletvereniging")) {
-                    LOGGER.warning("Skipped record from Amsterdamse Paletvereniging");
-                    return true;
+                for (String blacklistOrganization : blacklist.getOrganizations()) {
+                    if (organization.toLowerCase().contains(blacklistOrganization.toLowerCase())) {
+                        LOGGER.info("Skipped record from o");
+                        return true;
+                    }
                 }
             }
         }
 
-        if (BLACKLIST.contains(barcode)) {
-            LOGGER.warning("Skipped record that was blacklisted");
+        if (blacklist.getBarcodes().contains(barcode)) {
+            LOGGER.info("Skipped record that was blacklisted");
             return true;
         }
 
@@ -163,7 +162,7 @@ public class RandomRecord {
             if ((image.getWidth() >= MIN_SIZE) || (image.getHeight() >= MIN_SIZE)) {
                 return true;
             }
-            LOGGER.warning("Invalid size: " + image.getWidth() + ", " + image.getHeight());
+            LOGGER.info("Invalid size: " + image.getWidth() + ", " + image.getHeight());
         }
 
         return false;

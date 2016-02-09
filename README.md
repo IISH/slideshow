@@ -4,7 +4,7 @@ Show a slideshow of interesting items owned by the IISH
 ### Running
 The slideshow application is built with Spring Boot. Therefore the application can be run by:
 - Simply running the main class
-- Running with the Maven command: spring-boot:run
+- Running with the Maven command: *spring-boot:run*
 It will use a packaged servlet engine (Tomcat) that will be automatically configured. 
 
 ### Building
@@ -16,9 +16,10 @@ You can add a new configuration file with the name *application.properties* or *
 - classpath:/config
 - file:
 - file:config/
+
 If the configuration file is placed somewhere else, the location can be specified using the argument *--spring.config.location=/location/of/config/files* or the environment variable *SPRING_CONFIG_LOCATION*. 
 
-There is a sample configuration file, *application-example.properties*, located in the *classpath:/config* folder.
+There is a sample configuration file, *application-example.yaml*, located in the *classpath:/config* folder.
 
 ### Minimal requirements
 The slideshow application currently requires the following:
