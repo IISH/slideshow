@@ -131,7 +131,7 @@ public class RandomRecord {
                 String organization = subfield.getData();
                 for (String blacklistOrganization : blacklist.getOrganizations()) {
                     if (organization.toLowerCase().contains(blacklistOrganization.toLowerCase())) {
-                        LOGGER.info("Skipped record from o");
+                        LOGGER.info("Skipped record from organization " + blacklistOrganization);
                         return true;
                     }
                 }
