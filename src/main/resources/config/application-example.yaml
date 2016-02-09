@@ -1,0 +1,21 @@
+api:
+  url: http://api.socialhistoryservices.org/solr/all/srw
+
+sor:
+  accessToken: [an access token]
+
+slideshow:
+  timeout: 30
+
+blacklist:
+  barcodes:
+    - 30051002834569
+    - 30051001316337
+    - 30051001362448
+    - 30051002739081
+    - 30051001115101
+    - 30051001803581
+    - 30051000646890
+    - 30051002347059
+  organizations:
+    - amsterdamse paletvereniging
