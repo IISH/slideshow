@@ -75,7 +75,7 @@ var newSlide = function () {
         }
     };
 
-    xmlHttp.open('GET', '/nextSlide', true);
+    xmlHttp.open('GET', '/nextSlide?r=' + Math.random(), true);
     xmlHttp.send();
 };
 
