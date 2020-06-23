@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -53,13 +54,16 @@ public class SlideshowController {
     @RequestMapping(value = "/image", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> image(@RequestParam("barcode") String barcode) {
         try {
-            // TODO: "https//hdl.handle.net/10622" + barcode + "?locatt=view:level2" + "&urlappend=?access_token=" + accessToken;
-            URL url = new URL("http://disseminate.objectrepository.org/file/level2/10622/" +
+            final URL url = new URL("https://hdl.handle.net/10622/" +
                     URLEncoder.encode(barcode, "UTF-8")
-                    + "?access_token=" + URLEncoder.encode(accessToken, "UTF-8"));
+                    + "?locatt=view:level1");
+
+            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setInstanceFollowRedirects(true);
+
             return ResponseEntity.ok()
                     .contentType(MediaType.IMAGE_JPEG)
-                    .body(new InputStreamResource(url.openStream()));
+                    .body(new InputStreamResource(connection.getInputStream()));
         } catch (MalformedURLException murle) {
             murle.printStackTrace();
             return null;

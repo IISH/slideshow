@@ -147,10 +147,9 @@ public class RandomRecord {
     }
 
     private boolean isImgInSor(String barcode) throws Exception {
-        // TODO: "https//hdl.handle.net/10622/" + barcode + "?locatt=view:level2" + "&urlappend=?access_token=" + accessToken;
-        URL url = new URL("http://disseminate.objectrepository.org/file/level2/10622/" +
-                URLEncoder.encode(barcode, "UTF-8") +
-                "?access_token=" + URLEncoder.encode(accessToken, "UTF-8"));
+        final URL url = new URL("https://hdl.handle.net/10622/" +
+                URLEncoder.encode(barcode, "UTF-8")
+                + "?locatt=view:level1");
 
         HttpURLConnection testConn = (HttpURLConnection) url.openConnection();
         testConn.setInstanceFollowRedirects(true);
