@@ -6,7 +6,6 @@ import org.marc4j.MarcXmlReader;
 import org.marc4j.marc.DataField;
 import org.marc4j.marc.Record;
 import org.marc4j.marc.Subfield;
-import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -27,25 +26,24 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
 public class RandomRecord {
     private static final int MAX_RECORDS = 20;
-    private static final int MIN_SIZE    = 400;
+    private static final int MIN_SIZE = 400;
 
-    private final String          apiUrl;
-    private final String          accessToken;
-    private final List<String>    formats;
-    private final Blacklist       blacklist;
+    private final String apiUrl;
+    private final List<String> formats;
+    private final Blacklist blacklist;
     private final DocumentBuilder documentBuilder;
 
     private static final Logger LOGGER = Logger.getLogger(RandomRecord.class.getName());
 
-    public RandomRecord(String apiUrl, String accessToken, List<String> formats, Blacklist blacklist) {
+    public RandomRecord(String apiUrl, List<String> formats, Blacklist blacklist) {
         this.apiUrl = apiUrl;
-        this.accessToken = accessToken;
         this.formats = formats;
         this.blacklist = blacklist;
 
@@ -148,8 +146,7 @@ public class RandomRecord {
 
     private boolean isImgInSor(String barcode) throws Exception {
         final URL url = new URL("https://hdl.handle.net/10622/" +
-                URLEncoder.encode(barcode, "UTF-8")
-                + "?locatt=view:level1");
+                URLEncoder.encode(barcode, StandardCharsets.UTF_8) + "?locatt=view:level1");
 
         HttpURLConnection testConn = (HttpURLConnection) url.openConnection();
         testConn.setInstanceFollowRedirects(true);
@@ -168,7 +165,8 @@ public class RandomRecord {
     }
 
     private Document getApiResult(String format, int startRecord, int maxRecords) throws Exception {
-        InputStream in = new URL(apiUrl + "?query=dc.type+%3D+%22" + URLEncoder.encode(format, "UTF-8") + "%22" +
+        InputStream in = new URL(apiUrl +
+                "?query=dc.type+%3D+%22" + URLEncoder.encode(format, StandardCharsets.UTF_8) + "%22" +
                 "&version=1.1" +
                 "&operation=searchRetrieve" +
                 "&recordSchema=info%3Asrw%2Fschema%2F1%2Fmarcxml-v1.1" +
@@ -180,7 +178,7 @@ public class RandomRecord {
     }
 
     private static String fixFormat(String format) {
-        format = StringUtils.capitalize(format);
+        format = format.substring(0, 1).toUpperCase() + format.substring(1);
         if (!format.endsWith(".")) {
             format += ".";
         }

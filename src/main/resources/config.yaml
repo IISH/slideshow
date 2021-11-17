@@ -1,11 +1,5 @@
-api:
-  url: http://api.socialhistoryservices.org/solr/all/srw
-
-sor:
-  accessToken: [an access token]
-
-slideshow:
-  timeout: 30
+timeout: 30
+api: https://api.socialhistoryservices.org/solr/all/srw
 
 blacklist:
   barcodes:

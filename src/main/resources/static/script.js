@@ -37,7 +37,7 @@ var newSlide = function () {
     var xmlHttp = new XMLHttpRequest();
 
     xmlHttp.onreadystatechange = function () {
-        if ((xmlHttp.readyState == XMLHttpRequest.DONE) && (xmlHttp.status == 200)) {
+        if ((xmlHttp.readyState === XMLHttpRequest.DONE) && (xmlHttp.status === 200)) {
             var hiddenImg = imageContainer.querySelector('img.hidden');
             var hiddenDl = metadataContainer.querySelector('dl.hidden');
 
@@ -67,8 +67,8 @@ var newSlide = function () {
                         mainImages[i].classList.toggle('hidden');
                     }
 
-                    for (var i = 0; i < metadataDls.length; i++) {
-                        metadataDls[i].classList.toggle('hidden');
+                    for (var j = 0; j < metadataDls.length; j++) {
+                        metadataDls[j].classList.toggle('hidden');
                     }
                 };
             }
@@ -96,13 +96,19 @@ iishLogo.onload = function () {
     setLogo();
 };
 
-var body = document.getElementsByTagName('body')[0];
-var timeout = parseInt(body.dataset.timeout);
-if (timeout > 0) {
-    window.setInterval(function () {
-        newSlide();
-    }, timeout);
+var xmlHttp = new XMLHttpRequest();
+xmlHttp.onreadystatechange = function () {
+    if ((xmlHttp.readyState === XMLHttpRequest.DONE) && (xmlHttp.status === 200)) {
+        var timeout = parseInt(xmlHttp.responseText);
+        if (timeout > 0) {
+            window.setInterval(function () {
+                newSlide();
+            }, timeout * 1000);
+        }
+    }
 }
+xmlHttp.open('GET', '/timeout', true);
+xmlHttp.send();
 
 iishLogo.onclick = function () {
     if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {

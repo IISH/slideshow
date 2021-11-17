@@ -4,14 +4,13 @@ import org.marc4j.marc.DataField;
 import org.marc4j.marc.Record;
 import org.marc4j.marc.Subfield;
 import org.marc4j.marc.VariableField;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 
 public class RecordExtractor {
     private static final int MAX_WORDS_NOTE = 50;
 
-    private Record record;
+    private final Record record;
 
     public RecordExtractor(Record record) {
         this.record = record;
@@ -51,14 +50,14 @@ public class RecordExtractor {
                 return;
             }
 
-            metadata.put("Title", Arrays.asList(title));
+            metadata.put("Title", List.of(title));
         }
     }
 
     private void extractYear(Map<String, List<String>> metadata) {
         String year = extractFirst("260", 'c');
         if (year != null) {
-            metadata.put("Year", Arrays.asList(year));
+            metadata.put("Year", List.of(year));
         }
     }
 
@@ -90,7 +89,7 @@ public class RecordExtractor {
             if (note != null) {
                 StringTokenizer st = new StringTokenizer(note, " ");
                 if (st.countTokens() <= MAX_WORDS_NOTE) {
-                    metadata.put("Note", Arrays.asList(note));
+                    metadata.put("Note", List.of(note));
                 }
             }
         }
@@ -123,10 +122,10 @@ public class RecordExtractor {
                 if (label == null) {
                     label = defaultLabel;
                 }
-                label = StringUtils.capitalize(label);
+                label = label.substring(0, 1).toUpperCase() + label.substring(1);
 
                 if (!metadata.containsKey(label)) {
-                    metadata.put(label, new ArrayList<String>());
+                    metadata.put(label, new ArrayList<>());
                 }
 
                 List<String> values = metadata.get(label);
@@ -160,8 +159,7 @@ public class RecordExtractor {
 
     private String extractSubfields(DataField dataField, boolean cleanValue, char... subfieldChars) {
         StringBuilder sb = new StringBuilder();
-        List<Subfield> subfields = (subfieldChars.length == 0)
-                ? dataField.getSubfields() : new ArrayList<Subfield>();
+        List<Subfield> subfields = (subfieldChars.length == 0) ? dataField.getSubfields() : new ArrayList<>();
 
         for (char subfieldChar : subfieldChars) {
             Subfield subfield = dataField.getSubfield(subfieldChar);

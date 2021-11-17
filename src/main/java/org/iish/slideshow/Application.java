@@ -1,23 +1,39 @@
 package org.iish.slideshow;
 
-import org.springframework.boot.Banner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
+import io.javalin.Javalin;
+import io.javalin.http.staticfiles.Location;
+import org.iish.slideshow.configuration.Config;
+import org.iish.slideshow.web.SlideshowApi;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
-@SpringBootApplication
-public class Application extends SpringBootServletInitializer {
+import java.io.FileInputStream;
+import java.io.InputStream;
+
+import static io.javalin.apibuilder.ApiBuilder.get;
+
+public class Application {
     public static void main(String[] args) throws Exception {
-        SpringApplication application = new SpringApplication(Application.class);
-        application.setBannerMode(Banner.Mode.OFF);
-        application.run(args);
-    }
+        final InputStream configStream = System.getProperty("config") != null
+                ? new FileInputStream(System.getProperty("config"))
+                : Application.class.getClassLoader().getResourceAsStream("config.yaml");
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application
-                .sources(Application.class)
-                .bannerMode(Banner.Mode.OFF);
+        final Yaml yaml = new Yaml(new Constructor(Config.class));
+        final Config config = yaml.load(configStream);
+
+        final SlideshowApi slideshowApi = new SlideshowApi(config);
+        final Javalin app = Javalin.create(cfg -> {
+            cfg.showJavalinBanner = false;
+            cfg.addStaticFiles("/static", Location.CLASSPATH);
+        }).start(Integer.parseInt(System.getProperty("port", "8080")));
+
+        app.routes(() -> {
+            get("/timeout", context -> context.result(String.valueOf(config.getTimeout())));
+            get("/nextSlide", context -> context.json(slideshowApi.nextSlide()));
+            get("/image", context -> {
+                context.contentType("image/jpeg");
+                context.result(slideshowApi.image(context.queryParam("barcode")));
+            });
+        });
     }
 }
