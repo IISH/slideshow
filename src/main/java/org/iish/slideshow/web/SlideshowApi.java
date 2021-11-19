@@ -18,7 +18,7 @@ public class SlideshowApi {
     private final RecordHolder recordHolder;
 
     public SlideshowApi(Config config) {
-        recordHolder = new RecordHolder(config.getApi(), config.getBlacklist());
+        recordHolder = new RecordHolder(config.api(), config.blacklist());
     }
 
     public Slide nextSlide() {

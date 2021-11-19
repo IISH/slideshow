@@ -1,11 +1,11 @@
 package org.iish.slideshow;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import org.iish.slideshow.configuration.Config;
 import org.iish.slideshow.web.SlideshowApi;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -18,8 +18,8 @@ public class Application {
                 ? new FileInputStream(System.getProperty("config"))
                 : Application.class.getClassLoader().getResourceAsStream("config.yaml");
 
-        final Yaml yaml = new Yaml(new Constructor(Config.class));
-        final Config config = yaml.load(configStream);
+        final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        final Config config = mapper.readValue(configStream, Config.class);
 
         final SlideshowApi slideshowApi = new SlideshowApi(config);
         final Javalin app = Javalin.create(cfg -> {
@@ -28,7 +28,7 @@ public class Application {
         }).start(Integer.parseInt(System.getProperty("port", "8080")));
 
         app.routes(() -> {
-            get("/timeout", context -> context.result(String.valueOf(config.getTimeout())));
+            get("/timeout", context -> context.result(String.valueOf(config.timeout())));
             get("/nextSlide", context -> context.json(slideshowApi.nextSlide()));
             get("/image", context -> {
                 context.contentType("image/jpeg");

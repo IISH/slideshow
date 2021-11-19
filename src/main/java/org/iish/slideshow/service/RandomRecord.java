@@ -127,7 +127,7 @@ public class RandomRecord {
             Subfield subfield = dataField.getSubfield('a');
             if (subfield != null) {
                 String organization = subfield.getData();
-                for (String blacklistOrganization : blacklist.getOrganizations()) {
+                for (String blacklistOrganization : blacklist.organizations()) {
                     if (organization.toLowerCase().contains(blacklistOrganization.toLowerCase())) {
                         LOGGER.info("Skipped record from organization " + blacklistOrganization);
                         return true;
@@ -136,7 +136,7 @@ public class RandomRecord {
             }
         }
 
-        if (blacklist.getBarcodes().contains(barcode)) {
+        if (blacklist.barcodes().contains(barcode)) {
             LOGGER.info("Skipped record that was blacklisted");
             return true;
         }
